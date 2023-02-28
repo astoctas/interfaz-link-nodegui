@@ -1,10 +1,15 @@
-import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QIcon, WidgetEventTypes } from '@nodegui/nodegui';
+import {QApplication, QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QIcon, WidgetEventTypes, QSystemTrayIcon } from '@nodegui/nodegui';
+import { truncate } from 'fs';
 import logo from '../assets/logox200.png';
 const {fork, spawn} = require('child_process');
 const path = require('path');
 
+const qApp = QApplication.instance();
+
+
 const win = new QMainWindow();
 win.setWindowTitle("Hello World");
+win.setWindowIcon(new QIcon(logo));
 
 const centralWidget = new QWidget();
 centralWidget.setObjectName("myroot");
@@ -23,6 +28,13 @@ label2.setText("World");
 label2.setInlineStyle(`
   color: red;
 `);
+
+const tray = new QSystemTrayIcon();
+tray.setIcon(new QIcon(logo));
+tray.show();
+tray.addEventListener("activated", () => {
+  win.showNormal();
+})
 
 rootLayout.addWidget(label);
 rootLayout.addWidget(button);
@@ -45,7 +57,7 @@ win.setStyleSheet(
 );
 var q = fork('./dist/child.js'); 
 win.addEventListener(WidgetEventTypes.Close, () => q.kill());
-win.show();
+//win.showMinimized();
 
 
 
