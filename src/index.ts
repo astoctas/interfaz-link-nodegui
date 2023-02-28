@@ -1,5 +1,7 @@
-import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QIcon } from '@nodegui/nodegui';
+import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QIcon, WidgetEventTypes } from '@nodegui/nodegui';
 import logo from '../assets/logox200.png';
+const {fork, spawn} = require('child_process');
+const path = require('path');
 
 const win = new QMainWindow();
 win.setWindowTitle("Hello World");
@@ -41,6 +43,10 @@ win.setStyleSheet(
     }
   `
 );
+var q = fork('./dist/child.js'); 
+win.addEventListener(WidgetEventTypes.Close, () => q.kill());
 win.show();
+
+
 
 (global as any).win = win;
