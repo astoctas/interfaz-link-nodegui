@@ -71,9 +71,11 @@ label.setInlineStyle("color: #FFFFFF;");
 const label2 = new QLabel();
 label2.setObjectName("mylabel2");
 //label2.setText("127.0.0.1:4268");
+label2.setInlineStyle("color: #FFFFFF;");
 
 const label3 = new QLabel();
 label3.setObjectName("mylabel3");
+label3.setInlineStyle("color: #FFFFFF;");
 
 const button = new QPushButton();
 button.setObjectName("mybutton");
