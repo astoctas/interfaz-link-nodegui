@@ -1,4 +1,4 @@
-import {QApplication, QMainWindow, QWidget, QLabel, FlexLayout, QComboBox, QPushButton, QIcon, WidgetEventTypes, QSystemTrayIcon, QMenu, QKeySequence, QAction } from '@nodegui/nodegui';
+import {QApplication, QMainWindow, QWidget, QLabel, FlexLayout, QComboBox, QPushButton, QIcon, WidgetEventTypes, QSystemTrayIcon, QMenu, QAction } from '@nodegui/nodegui';
 import { truncate } from 'fs';
 import { SocketAddress } from 'net';
 import { inherits } from 'util';
@@ -7,7 +7,6 @@ import logo from '../assets/64.png';
 const {fork, spawn} = require('child_process');
 const path = require('path');
 const storage = require('node-persist');
-const notifier = require('node-notifier');
 
 var serialPorts = Array();
 var connected = 1;
@@ -67,6 +66,7 @@ midWidget.setLayout(midLayout);
 const label = new QLabel();
 label.setObjectName("mylabel");
 label.setText("Servidor socket:");
+label.setInlineStyle("color: #FFFFFF;");
 
 const label2 = new QLabel();
 label2.setObjectName("mylabel2");
@@ -78,10 +78,11 @@ label3.setObjectName("mylabel3");
 const button = new QPushButton();
 button.setObjectName("mybutton");
 button.setText("Conectar");
+button.setInlineStyle("width: 100px; font-weight: bold");
 
 const combo = new QComboBox();
 combo.setObjectName("mycombo");
-combo.setInlineStyle("color: #009688;");
+combo.setInlineStyle("color: #009688;margin-bottom: 5px; padding: 5px;");
 
 const tray = new QSystemTrayIcon();
 tray.setIcon(new QIcon(logo));
@@ -162,18 +163,7 @@ win.setStyleSheet(
 );
 
 function notify(msg: string) {
-  notifier.notify(
-    {
-      title: 'Interfaz Link',
-      message: msg,
-      icon: false,
-      sound: true, // Only Notification Center or Windows Toasters
-      wait: false // Wait with callback, until user action is taken against notification, does not apply to Windows Toasters as they always wait or notify-send as it does not support the wait option
-    } , function (err: any, response: any, metadata: any) {
-      console.log(err, response, metadata)
-      // Response is response from notification
-      // Metadata contains activationType, activationAt, deliveredAt
-    }) 
+  tray.showMessage("Interfaz Link", msg, new QIcon(logo));
 }
 
 async function setConnected(p:string) {
