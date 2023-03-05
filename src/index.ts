@@ -187,10 +187,11 @@ function setConnecting(p:string) {
   },100)
   top2Widget.setInlineStyle("background-color: orange;");
 }
-function setDisconnected() {
+function setDisconnected(alert: boolean) {
   connected = 0; 
   label3.setText("Interfaz desconectada");
-  notify('Interfaz desconectada');
+  if(alert)
+    notify('Interfaz desconectada');
   setTimeout(()=>{
     label3.adjustSize();
   },100)
@@ -240,10 +241,10 @@ function fork_child() {
         setConnected(m.msg);
       break;
       case "disconnect":
-        setDisconnected();
+        setDisconnected(true);
       break;
       case "error":
-        setDisconnected();
+        setDisconnected(false);
       break;
     }   
   })
