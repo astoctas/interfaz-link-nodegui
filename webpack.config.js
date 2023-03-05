@@ -42,8 +42,8 @@ module.exports = {
   },
   plugins: [new CleanWebpackPlugin(), new CopyPlugin({
     patterns: [
-      { from: "src/**/*.js", to: "[name][ext]",
-    }
+      { from: "src/**/*.js", to: "[name][ext]"},
+      { from: "src/lib/**/*.js", to: "lib/[name][ext]"}
     ],
   }),]
 };
