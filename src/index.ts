@@ -165,7 +165,8 @@ win.setStyleSheet(
 );
 
 function notify(msg: string) {
-  tray.showMessage("Interfaz Link", msg, new QIcon(logo));
+  tray.showMessage("Interfaz Link", msg, undefined, 1000);
+  qApp.processEvents()
 }
 
 async function setConnected(p:string) {
