@@ -15,6 +15,7 @@ async function  listSerialPorts() {
 }
 
 function connectCallback(msg) {
+  Socket.socket.setInterfaz(Serial.serial.getIfaz());
   process.send(msg)
 }
 
@@ -60,6 +61,11 @@ process.on("message", (m) => {
     break;
     case "serialConnect":
       Serial.serial.connect(m.port,connectCallback);
+    break;
+    case "socketDisconnect":
+      if(typeof Socket.socket.socketInstance != "undefined")
+        Socket.socket.socketInstance.disconnect();
+      send_msg("socketDisconnected", {"port": m.port});
     break;
     }
 })

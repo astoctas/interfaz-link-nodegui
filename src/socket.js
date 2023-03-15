@@ -44,14 +44,18 @@ function Socket() {
     } catch (err) {
       console.log(err)
     }
-    this.initEvents();
   }
-
+  
   this.initMessage = function() {
     if(!this.ifaz) return false;
     if(typeof this.ifaz.lcd() == "undefined") return false;
-    this.ifaz.lcd().clearTimeout();  
+   // this.ifaz.lcd().clearTimeout();  
     return true;
+  }
+  
+  this.setInterfaz = function(ifaz) {
+    this.ifaz = ifaz;
+    this.initEvents();
   }
 
   this.initEvents = function() {
@@ -60,7 +64,7 @@ function Socket() {
     var me = this;
     
     this.io.sockets.on('connection', function (socket) {
-      //console.log(socket)
+      console.log("Conexion")
       socket.conn.on("packet", ({ type, data }) => {
         // called for each packet received
         console.log(type, data)
@@ -68,7 +72,7 @@ function Socket() {
         me.initMessage();
       });      
       
-      socketInstance = socket;
+      me.socketInstance = socket;
 
       socket.emit("SOCKET_CONNECTED");
       
@@ -108,22 +112,24 @@ function Socket() {
       socket.on('ANALOG', (data, callback) => {
         if(!ifaz)  return;
         data = typeof data == "string" ? JSON.parse(data) : data;
-        var result = ifaz.analog(data.index)[data.method](function (result) {
-          //socket.emit('ANALOG_MESSAGE', { index: data.index, value: result });
-          //socket.emit('SENSOR_MESSAGE', { index: data.index, value: this.value, boolean: this.boolean });
-        });
-        let value = ifaz.analog(data.index).value();
-        if(callback) callback(value);
+        obj = ifaz.analog(data.index);
+        if(!obj.changeCallback) obj.change((result) => {
+          socket.emit('ANALOG_MESSAGE', { index: data.index, value: result });
+        })
+        var result = ifaz.analog(data.index)[data.method]();
+        if(callback) {
+          callback(result);
+        }
       })
       
-      socket.on('ULTRASONIC', (data, callback) => {
+      socket.on('PING', (data, callback) => {
         if(!ifaz)  return;
         data = typeof data == "string" ? JSON.parse(data) : data;
         var obj = ifaz.ping(data.index);
         var result = obj[data.method](function (result) {
           //console.log(result)
           ifaz.ping(data.index).cm = result.cm;
-          //socket.emit('ULTRASONIC_MESSAGE', { index: data.index+1, cm: result.cm, inches: result.inches, value: result.cm });
+          socket.emit('PING_MESSAGE', { index: data.index, cm: result.cm, inches: result.inches, value: result.cm });
         }, data.controller);
         let value = ifaz.ping(data.index).value();
         if(callback) callback(value);        
@@ -168,14 +174,12 @@ function Socket() {
       socket.on('DIGITAL', function (data) {
         if(!ifaz)  return;
         data = typeof data == "string" ? JSON.parse(data) : data;
-        if (data.method == 'on') {
-         var result = ifaz.digital(data.index)[data.method](function (result) {
+        obj = ifaz.digital(data.index);
+        if(!obj.changeCallback) obj.change((result) => {
             socket.emit('DIGITAL_MESSAGE', { index: data.index, value: result });
-          });
-        } else {
-          var result = ifaz.digital(data.index)[data.method](data.param);
-        }
-    
+            console.log(result)
+        })
+        var result = ifaz.digital(data.index)[data.method]();
       })
     
       socket.on('LCD', function (data) {

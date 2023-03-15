@@ -199,6 +199,10 @@ function setDisconnected(alert: boolean) {
 }
 
 function sendConnect(p: string) {
+  socket.send({"type": "socketDisconnect", "port": p});
+}
+
+function doSendConnect(p: string) {
   socket.kill();
   socket = fork_child();  
   socket.send({"type": "serialConnect", "port": p});
@@ -211,7 +215,7 @@ function fork_child() {
   })
   
   child.on("message", (m: any) => {
-    console.log('Got message:', m);
+    console.log('Got message:', m, typeof m);
     const t = m.type;
     switch (t) {
       case  "listSerialPorts": 
@@ -237,6 +241,9 @@ function fork_child() {
           label2.setText(label2.text() + e + ":4268"+ "\n");
         })
       break;
+      case "socketDisconnected":
+        doSendConnect(m.port); 
+      break; 
       case "connect":
         setConnected(m.msg);
       break;
@@ -252,8 +259,8 @@ function fork_child() {
 }
 
 connected = 0; 
-start();
 var socket = fork_child();
+start();
 
 setInterval(()=>{
   if(!connected) {
